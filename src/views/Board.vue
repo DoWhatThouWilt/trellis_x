@@ -44,6 +44,15 @@ function pickupColumn(e, fromColumnIndex) {
   e.dataTransfer.setData('from-column-index', fromColumnIndex)
 }
 
+function moveTaskOrColumn(e, toTasks, board, toColumnIndex) {
+  const type = e.dataTransfer.getData('type')
+  if (type === 'task') {
+    moveTask(e, toTasks, board)
+  } else {
+    moveColumn(e, toColumnIndex)
+  }
+}
+
 function moveTask(e, toTasks, board) {
   const fromColumnIndex = e.dataTransfer.getData('from-column-index')
   const fromTasks = board.columns[fromColumnIndex].tasks
@@ -55,6 +64,14 @@ function moveTask(e, toTasks, board) {
     taskIndex: taskIndex
   })
 }
+
+function moveColumn(e, toColumnIndex) {
+  const fromColumnIndex = e.dataTransfer.getData('from-column-index')
+  store.commit('move_column', {
+    fromColumnIndex: fromColumnIndex,
+    toColumnIndex: toColumnIndex
+  })
+}
 </script>
 
 <template>
@@ -64,7 +81,7 @@ function moveTask(e, toTasks, board) {
         class="column"
         :key="column.name"
         v-for="(column, $columnIndex) of board.columns"
-        @drop="moveTask($event, column.tasks, board)"
+        @drop="moveTaskOrColumn($event, column.tasks, board, $columnIndex)"
         @dragover.prevent
         @dragenter.prevent
         draggable="true"
