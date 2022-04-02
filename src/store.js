@@ -37,6 +37,17 @@ export default createStore({
     },
     update_task(_state, { task, key, value }) {
       task[key] = value
+    },
+    move_task(_state, { fromTasks, toTasks, taskIndex }) {
+      const taskToMove = fromTasks.splice(taskIndex, 1)[0] // getting the element in the list by index
+      // const taskToMove = fromTasks.at(taskIndex) // This doesn't work
+      toTasks.push(taskToMove)
+    },
+    move_column(state, { fromColumnIndex, toColumnIndex }) {
+      const columnList = state.board.columns
+      const columnToMove = columnList.splice(fromColumnIndex, 1)[0]
+      // const columnToMove = columnList.at(fromColumnIndex)
+      columnList.splice(toColumnIndex, 0, columnToMove)
     }
   }
 })

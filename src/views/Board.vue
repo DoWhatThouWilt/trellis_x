@@ -26,14 +26,59 @@ function createTask(event, tasks) {
   })
   event.target.value = ''
 }
+
+function pickupTask(e, taskIndex, fromColumnIndex) {
+  e.dataTransfer.effectAllowed = 'move'
+  e.dataTransfer.dropEffect = 'move'
+
+  e.dataTransfer.setData('type', 'task')
+  e.dataTransfer.setData('task-index', taskIndex)
+  e.dataTransfer.setData('from-column-index', fromColumnIndex)
+}
+
+function pickupColumn(e, fromColumnIndex) {
+  e.dataTransfer.effectAllowed = 'move'
+  e.dataTransfer.dropEffect = 'move'
+
+  e.dataTransfer.setData('type', 'column')
+  e.dataTransfer.setData('from-column-index', fromColumnIndex)
+}
+
+function moveTask(e, toTasks, board) {
+  const fromColumnIndex = e.dataTransfer.getData('from-column-index')
+  const fromTasks = board.columns[fromColumnIndex].tasks
+  const taskIndex = e.dataTransfer.getData('task-index')
+
+  store.commit('move_task', {
+    fromTasks: fromTasks,
+    toTasks: toTasks,
+    taskIndex: taskIndex
+  })
+}
 </script>
 
 <template>
   <div class="board">
     <div class="flex items-start">
-      <div class="column" :key="column.name" v-for="column of board.columns">
+      <div
+        class="column"
+        :key="column.name"
+        v-for="(column, $columnIndex) of board.columns"
+        @drop="moveTask($event, column.tasks, board)"
+        @dragover.prevent
+        @dragenter.prevent
+        draggable="true"
+        @dragstart.self="pickupColumn($event, $columnIndex)"
+      >
         <div class="flex items-center mb-2 font-bold">{{ column.name }}</div>
-        <div class="task" @click="goToTask(task)" :key="task.uuid" v-for="task of column.tasks">
+        <div
+          class="task"
+          :key="task.uuid"
+          v-for="(task, $taskIndex) of column.tasks"
+          draggable="true"
+          @dragstart="pickupTask($event, $taskIndex, $columnIndex)"
+          @click="goToTask(task)"
+        >
           <span class="w-full flex-shrink-0 font-bold">{{ task.name }}</span>
           <p
             v-if="task.description"
