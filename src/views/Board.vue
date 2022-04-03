@@ -32,7 +32,7 @@ function pickupTask(e, taskIndex, fromColumnIndex) {
   e.dataTransfer.dropEffect = 'move'
 
   e.dataTransfer.setData('type', 'task')
-  e.dataTransfer.setData('task-index', taskIndex)
+  e.dataTransfer.setData('from-task-index', taskIndex)
   e.dataTransfer.setData('from-column-index', fromColumnIndex)
 }
 
@@ -53,15 +53,16 @@ function moveTaskOrColumn(e, toTasks, board, toColumnIndex) {
   }
 }
 
-function moveTask(e, toTasks, board) {
+function moveTask(e, toTasks, board, toTaskIndex) {
   const fromColumnIndex = e.dataTransfer.getData('from-column-index')
   const fromTasks = board.columns[fromColumnIndex].tasks
-  const taskIndex = e.dataTransfer.getData('task-index')
+  const fromTaskIndex = e.dataTransfer.getData('from-task-index')
 
   store.commit('move_task', {
     fromTasks: fromTasks,
     toTasks: toTasks,
-    taskIndex: taskIndex
+    fromTaskIndex: fromTaskIndex,
+    toTaskIndex: toTaskIndex
   })
 }
 
@@ -91,10 +92,13 @@ function moveColumn(e, toColumnIndex) {
         <div
           class="task"
           :key="task.uuid"
+          @click="goToTask(task)"
           v-for="(task, $taskIndex) of column.tasks"
           draggable="true"
           @dragstart="pickupTask($event, $taskIndex, $columnIndex)"
-          @click="goToTask(task)"
+          @dragover="prevent"
+          @dragenter="prevent"
+          @drop.stop="moveTask($event, column.tasks, board, $taskIndex)"
         >
           <span class="w-full flex-shrink-0 font-bold">{{ task.name }}</span>
           <p

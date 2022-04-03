@@ -8,8 +8,8 @@ export default {
       tasks: [
         {
           description: 'test',
-          name: 'actual first task',
-          id: "1",
+          name: 'sixth task',
+          id: uuid(),
           userAssigned: null
         }, {
           description: '',
@@ -20,12 +20,12 @@ export default {
         {
           description: '',
           name: 'second task',
-          id: "2",
+          id: uuid(),
           userAssigned: null
         },
         {
           description: '',
-          name: 'and thrid',
+          name: 'and third',
           id: uuid(),
           userAssigned: null
         }
@@ -36,7 +36,7 @@ export default {
       tasks: [
         {
           description: 'create this trello clone to impress my future employers',
-          name: 'first task',
+          name: 'fourth task',
           id: uuid(),
           userAssigned: null
         }
@@ -47,7 +47,7 @@ export default {
       tasks: [
         {
           description: '',
-          name: 'first task',
+          name: 'fifth task',
           id: uuid(),
           userAssigned: null
         }
