@@ -2,6 +2,7 @@
 import { defineProps, computed } from 'vue';
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { moveTaskOrColumn, useColumnProps } from "../composables/task_and_columns"
 
 defineProps({
   task: {
@@ -12,18 +13,7 @@ defineProps({
     type: Number,
     required: true
   },
-  board: {
-    type: Object,
-    required: true
-  },
-  column: {
-    type: Object,
-    required: true
-  },
-  columnIndex: {
-    type: Number,
-    required: true
-  }
+  ...useColumnProps
 })
 
 
@@ -45,40 +35,6 @@ function pickupTask(e, taskIndex, fromColumnIndex) {
   e.dataTransfer.setData('from-column-index', fromColumnIndex)
 }
 
-function moveTaskOrColumn(e, toTasks, board, toColumnIndex, toTaskIndex) {
-  const type = e.dataTransfer.getData('type')
-  if (type === 'task') {
-    moveTask(
-      e,
-      toTasks,
-      board,
-      toTaskIndex === undefined ? toTasks.length : toTaskIndex
-    )
-  } else {
-    moveColumn(e, toColumnIndex)
-  }
-}
-
-function moveTask(e, toTasks, board, toTaskIndex) {
-  const fromColumnIndex = e.dataTransfer.getData('from-column-index')
-  const fromTasks = board.columns[fromColumnIndex].tasks
-  const fromTaskIndex = e.dataTransfer.getData('from-task-index')
-
-  store.commit('move_task', {
-    fromTasks: fromTasks,
-    toTasks: toTasks,
-    fromTaskIndex: fromTaskIndex,
-    toTaskIndex: toTaskIndex
-  })
-}
-
-function moveColumn(e, toColumnIndex) {
-  const fromColumnIndex = e.dataTransfer.getData('from-column-index')
-  store.commit('move_column', {
-    fromColumnIndex: fromColumnIndex,
-    toColumnIndex: toColumnIndex
-  })
-}
 </script>
 
 <template>
@@ -89,7 +45,7 @@ function moveColumn(e, toColumnIndex) {
     @dragstart="pickupTask($event, taskIndex, columnIndex)"
     @dragover="prevent"
     @dragenter="prevent"
-    @drop.stop="moveTaskOrColumn($event, column.tasks, board, columnIndex, taskIndex)"
+    @drop.stop="moveTaskOrColumn($event, column.tasks, board, columnIndex, taskIndex, store)"
   >
     <!-- stopPropagation from bubbling up from the task to the column, 
           because they are listening for the same event, @drop.  If not for the modifier,
