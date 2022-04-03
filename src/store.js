@@ -39,10 +39,9 @@ export default createStore({
       task[key] = value
     },
     move_task(_state, { fromTasks, toTasks, fromTaskIndex, toTaskIndex }) {
-      console.log(toTaskIndex)
       const taskToMove = fromTasks.splice(fromTaskIndex, 1)[0] // getting the element in the list by index
       // toTasks.push(taskToMove)
-
+      console.log(`toTasks.splice(${toTaskIndex}, 0, taskToMove`)
       toTasks.splice(toTaskIndex, 0, taskToMove)
 
     },

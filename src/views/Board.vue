@@ -44,10 +44,15 @@ function pickupColumn(e, fromColumnIndex) {
   e.dataTransfer.setData('from-column-index', fromColumnIndex)
 }
 
-function moveTaskOrColumn(e, toTasks, board, toColumnIndex) {
+function moveTaskOrColumn(e, toTasks, board, toColumnIndex, toTaskIndex) {
   const type = e.dataTransfer.getData('type')
   if (type === 'task') {
-    moveTask(e, toTasks, board)
+    moveTask(
+      e,
+      toTasks,
+      board,
+      toTaskIndex === undefined ? toTasks.length : toTaskIndex
+    )
   } else {
     moveColumn(e, toColumnIndex)
   }
@@ -98,8 +103,13 @@ function moveColumn(e, toColumnIndex) {
           @dragstart="pickupTask($event, $taskIndex, $columnIndex)"
           @dragover="prevent"
           @dragenter="prevent"
-          @drop.stop="moveTask($event, column.tasks, board, $taskIndex)"
+          @drop.stop="moveTaskOrColumn($event, column.tasks, board, $columnIndex, $taskIndex)"
         >
+          <!-- stopPropagation from bubbling up from the task to the column, 
+because they are listening for the same event, @drop.  If not for the modifier,
+the event fires twice, first for the task, second for the column, which the event
+bubbles up to.
+          -->
           <span class="w-full flex-shrink-0 font-bold">{{ task.name }}</span>
           <p
             v-if="task.description"
