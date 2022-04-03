@@ -35,13 +35,18 @@ export default createStore({
         description: ''
       })
     },
+    create_column(state, { name }) {
+      state.board.columns.push({
+        name,
+        tasks: []
+      })
+    },
     update_task(_state, { task, key, value }) {
       task[key] = value
     },
     move_task(_state, { fromTasks, toTasks, fromTaskIndex, toTaskIndex }) {
       const taskToMove = fromTasks.splice(fromTaskIndex, 1)[0] // getting the element in the list by index
       // toTasks.push(taskToMove)
-      console.log(`toTasks.splice(${toTaskIndex}, 0, taskToMove`)
       toTasks.splice(toTaskIndex, 0, taskToMove)
 
     },
