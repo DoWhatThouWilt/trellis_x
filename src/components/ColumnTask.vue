@@ -1,19 +1,27 @@
 <script setup>
 import { defineProps, computed } from 'vue';
 import { useStore } from "vuex";
-import ColumnTask from '../components/ColumnTask.vue';
+import { useRouter } from "vue-router";
 
 defineProps({
+  task: {
+    type: Object,
+    required: true
+  },
+  taskIndex: {
+    type: Number,
+    required: true
+  },
+  board: {
+    type: Object,
+    required: true
+  },
   column: {
     type: Object,
     required: true
   },
   columnIndex: {
     type: Number,
-    required: true
-  },
-  board: {
-    type: Object,
     required: true
   }
 })
@@ -22,19 +30,18 @@ defineProps({
 const store = useStore()
 const board = computed(() => store.state.board)
 
-function createTask(event, tasks) {
-  store.commit('create_task', {
-    tasks, // tasks: tasks
-    name: event.target.value
-  })
-  event.target.value = ''
+const router = useRouter()
+
+function goToTask(task) {
+  router.push({ name: 'task', params: { id: task.id } })
 }
 
-function pickupColumn(e, fromColumnIndex) {
+function pickupTask(e, taskIndex, fromColumnIndex) {
   e.dataTransfer.effectAllowed = 'move'
   e.dataTransfer.dropEffect = 'move'
 
-  e.dataTransfer.setData('type', 'column')
+  e.dataTransfer.setData('type', 'task')
+  e.dataTransfer.setData('from-task-index', taskIndex)
   e.dataTransfer.setData('from-column-index', fromColumnIndex)
 }
 
@@ -76,37 +83,28 @@ function moveColumn(e, toColumnIndex) {
 
 <template>
   <div
-    class="column"
-    @drop="moveTaskOrColumn($event, column.tasks, board, columnIndex)"
-    @dragover.prevent
-    @dragenter.prevent
+    class="task"
+    @click="goToTask(task)"
     draggable="true"
-    @dragstart.self="pickupColumn($event, columnIndex)"
+    @dragstart="pickupTask($event, taskIndex, columnIndex)"
+    @dragover="prevent"
+    @dragenter="prevent"
+    @drop.stop="moveTaskOrColumn($event, column.tasks, board, columnIndex, taskIndex)"
   >
-    <div class="flex items-center mb-2 font-bold">{{ column.name }}</div>
+    <!-- stopPropagation from bubbling up from the task to the column, 
+          because they are listening for the same event, @drop.  If not for the modifier,
+          the event fires twice, first for the task, second for the column, which the event
+    bubbles up to.-->
 
-    <ColumnTask
-      v-for="(task, $taskIndex) of column.tasks"
-      :key="task.uuid"
-      :task="task"
-      :taskIndex="$taskIndex"
-      :board="board"
-      :column="column"
-      :columnIndex="columnIndex"
-    />
-
-    <input
-      @keyup.enter="createTask($event, column.tasks)"
-      type="text"
-      class="block p-2 w-full bg-transparent"
-      placeholder="+ Enter new task"
-    />
+    <span class="w-full flex-shrink-0 font-bold">{{ task.name }}</span>
+    <p v-if="task.description" class="w-full flex-shrink-0 mt-1 text-sm">{{ task.description }}</p>
   </div>
 </template>
 
+
+
 <style lang="css">
-.column {
-  @apply bg-gray-200 p-2 mr-4 text-left shadow rounded;
-  min-width: 350px;
+.task {
+  @apply flex items-center flex-wrap shadow mb-2 p-2 rounded bg-white text-gray-900;
 }
 </style>
