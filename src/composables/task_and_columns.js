@@ -1,3 +1,5 @@
+import Store from '../store'
+
 export const useColumnProps = {
   column: {
     type: Object,
@@ -13,7 +15,7 @@ export const useColumnProps = {
   }
 }
 
-export function moveTaskOrColumn(e, toTasks, board, toColumnIndex, toTaskIndex, store) {
+export function moveTaskOrColumn(e, toTasks, board, toColumnIndex, toTaskIndex) {
   const type = e.dataTransfer.getData('type')
   if (type === 'task') {
     moveTask(
@@ -21,19 +23,18 @@ export function moveTaskOrColumn(e, toTasks, board, toColumnIndex, toTaskIndex, 
       toTasks,
       board,
       toTaskIndex === undefined ? toTasks.length : toTaskIndex,
-      store
     )
   } else {
-    moveColumn(e, toColumnIndex, store)
+    moveColumn(e, toColumnIndex)
   }
 }
 
-export function moveTask(e, toTasks, board, toTaskIndex, store) {
+export function moveTask(e, toTasks, board, toTaskIndex) {
   const fromColumnIndex = e.dataTransfer.getData('from-column-index')
   const fromTasks = board.columns[fromColumnIndex].tasks
   const fromTaskIndex = e.dataTransfer.getData('from-task-index')
 
-  store.commit('move_task', {
+  Store.commit('move_task', {
     fromTasks: fromTasks,
     toTasks: toTasks,
     fromTaskIndex: fromTaskIndex,
@@ -41,11 +42,12 @@ export function moveTask(e, toTasks, board, toTaskIndex, store) {
   })
 }
 
-export function moveColumn(e, toColumnIndex, store) {
+export function moveColumn(e, toColumnIndex) {
   const fromColumnIndex = e.dataTransfer.getData('from-column-index')
-  store.commit('move_column', {
+  Store.commit('move_column', {
     fromColumnIndex: fromColumnIndex,
     toColumnIndex: toColumnIndex
   })
 }
+
 

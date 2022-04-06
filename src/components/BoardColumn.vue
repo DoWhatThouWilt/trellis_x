@@ -1,23 +1,12 @@
 <script setup>
 import { defineProps, computed } from 'vue';
 import { useStore } from "vuex";
+import { useColumnProps, moveTaskOrColumn } from '../composables/task_and_columns.js'
 import ColumnTask from '../components/ColumnTask.vue';
 
 defineProps({
-  column: {
-    type: Object,
-    required: true
-  },
-  columnIndex: {
-    type: Number,
-    required: true
-  },
-  board: {
-    type: Object,
-    required: true
-  }
+  ...useColumnProps
 })
-
 
 const store = useStore()
 const board = computed(() => store.state.board)
@@ -38,40 +27,6 @@ function pickupColumn(e, fromColumnIndex) {
   e.dataTransfer.setData('from-column-index', fromColumnIndex)
 }
 
-function moveTaskOrColumn(e, toTasks, board, toColumnIndex, toTaskIndex) {
-  const type = e.dataTransfer.getData('type')
-  if (type === 'task') {
-    moveTask(
-      e,
-      toTasks,
-      board,
-      toTaskIndex === undefined ? toTasks.length : toTaskIndex
-    )
-  } else {
-    moveColumn(e, toColumnIndex)
-  }
-}
-
-function moveTask(e, toTasks, board, toTaskIndex) {
-  const fromColumnIndex = e.dataTransfer.getData('from-column-index')
-  const fromTasks = board.columns[fromColumnIndex].tasks
-  const fromTaskIndex = e.dataTransfer.getData('from-task-index')
-
-  store.commit('move_task', {
-    fromTasks: fromTasks,
-    toTasks: toTasks,
-    fromTaskIndex: fromTaskIndex,
-    toTaskIndex: toTaskIndex
-  })
-}
-
-function moveColumn(e, toColumnIndex) {
-  const fromColumnIndex = e.dataTransfer.getData('from-column-index')
-  store.commit('move_column', {
-    fromColumnIndex: fromColumnIndex,
-    toColumnIndex: toColumnIndex
-  })
-}
 </script>
 
 <template>

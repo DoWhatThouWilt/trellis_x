@@ -45,7 +45,7 @@ function pickupTask(e, taskIndex, fromColumnIndex) {
     @dragstart="pickupTask($event, taskIndex, columnIndex)"
     @dragover="prevent"
     @dragenter="prevent"
-    @drop.stop="moveTaskOrColumn($event, column.tasks, board, columnIndex, taskIndex, store)"
+    @drop.stop="moveTaskOrColumn($event, column.tasks, board, columnIndex, taskIndex)"
   >
     <!-- stopPropagation from bubbling up from the task to the column, 
           because they are listening for the same event, @drop.  If not for the modifier,

@@ -28,6 +28,9 @@ function createColumn() {
 </script>
 
 <template>
+  <div
+    class="p-3 bg-gray-200 text-center font-extrabold shadow-xl shadow-teal-700 tracking-wider text-3xl"
+  >Trellis</div>
   <div class="board">
     <div class="flex items-start">
       <BoardColumn
