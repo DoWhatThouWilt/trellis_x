@@ -35,7 +35,7 @@ export default {
       name: 'in-progress',
       tasks: [
         {
-          description: 'create this trello clone to impress my future employers',
+          description: 'tabula rasa',
           name: 'fourth task',
           id: uuid(),
           userAssigned: null
